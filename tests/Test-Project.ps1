@@ -65,7 +65,8 @@ foreach ($file in $textFiles) {
 
 $requiredFiles = @(
     'README.md', '.gitignore', '.gitattributes', 'Launch-Winget-Updater.cmd',
-    'WingetCore.psm1', 'WingetScheduledScan.ps1', 'WingetUpdater.ps1'
+    'PSScriptAnalyzerSettings.psd1', 'WingetCore.psm1', 'WingetScheduledScan.ps1',
+    'WingetUpdater.ps1'
 )
 foreach ($relativePath in $requiredFiles) {
     if (-not (Test-Path -LiteralPath (Join-Path $repositoryRoot $relativePath) -PathType Leaf)) {
@@ -76,9 +77,10 @@ foreach ($relativePath in $requiredFiles) {
 $analyzer = Get-Module -ListAvailable PSScriptAnalyzer | Select-Object -First 1
 if ($analyzer) {
     Import-Module PSScriptAnalyzer
+    $analyzerSettings = Join-Path $repositoryRoot 'PSScriptAnalyzerSettings.psd1'
     $findings = @(
         foreach ($powerShellFile in $powerShellFiles) {
-            Invoke-ScriptAnalyzer -Path $powerShellFile.FullName -Severity Warning, Error
+            Invoke-ScriptAnalyzer -Path $powerShellFile.FullName -Settings $analyzerSettings
         }
     )
     if ($findings.Count -gt 0) {
@@ -88,4 +90,3 @@ if ($analyzer) {
 }
 
 Write-Output 'All project validation checks passed.'
-
