@@ -50,8 +50,8 @@ function ConvertFrom-WingetTable {
     if ($separatorIndex -lt 0) { return @() }
 
     $header = $normalized[$separatorIndex - 1]
-    $matches = [regex]::Matches($header, '\S(?:.*?\S)?(?=\s{2,}|$)')
-    $starts = @($matches | ForEach-Object { $_.Index })
+    $headerMatches = [regex]::Matches($header, '\S(?:.*?\S)?(?=\s{2,}|$)')
+    $starts = @($headerMatches | ForEach-Object { $_.Index })
 
     if ($starts.Count -lt 3) { return @() }
 
@@ -141,6 +141,7 @@ function Invoke-WingetCommand {
     }
     catch {
         # Encoding setters are unavailable on some older .NET Framework builds.
+        Write-Verbose "UTF-8 process stream encoding is unavailable: $($_.Exception.Message)"
     }
 
     $process = [System.Diagnostics.Process]::new()
