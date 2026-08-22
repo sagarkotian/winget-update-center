@@ -76,7 +76,11 @@ foreach ($relativePath in $requiredFiles) {
 $analyzer = Get-Module -ListAvailable PSScriptAnalyzer | Select-Object -First 1
 if ($analyzer) {
     Import-Module PSScriptAnalyzer
-    $findings = @(Invoke-ScriptAnalyzer -Path $powerShellFiles.FullName -Severity Warning, Error)
+    $findings = @(
+        foreach ($powerShellFile in $powerShellFiles) {
+            Invoke-ScriptAnalyzer -Path $powerShellFile.FullName -Severity Warning, Error
+        }
+    )
     if ($findings.Count -gt 0) {
         $findings | Format-Table -AutoSize
         throw 'PSScriptAnalyzer findings remain.'
@@ -84,3 +88,4 @@ if ($analyzer) {
 }
 
 Write-Output 'All project validation checks passed.'
+
