@@ -1,0 +1,15 @@
+# User-generated exports and logs
+*.csv
+*.log
+*.tmp
+*.bak
+
+# Local test and editor artifacts
+TestResults/
+.vscode/
+.idea/
+
+# Windows and macOS metadata
+Thumbs.db
+Desktop.ini
+.DS_Store
