@@ -190,6 +190,7 @@ Open the **Update history** tab and double-click the failed row. Common causes i
 |   |-- Test-Project.ps1
 |   `-- Test-WingetCore.ps1
 |-- Launch-Winget-Updater.cmd
+|-- PSScriptAnalyzerSettings.psd1
 |-- WingetCore.psm1
 |-- WingetScheduledScan.ps1
 |-- WingetUpdater.ps1
@@ -202,6 +203,7 @@ Open the **Update history** tab and double-click the failed row. Common causes i
 | `WingetCore.psm1` | Winget process runner, parser, history, logging, and schedule helpers |
 | `WingetScheduledScan.ps1` | Noninteractive scheduled scan and notification entry point |
 | `Launch-Winget-Updater.cmd` | Double-click launcher using Windows PowerShell 5.1 |
+| `PSScriptAnalyzerSettings.psd1` | Cross-version lint policy for intentional analyzer exceptions |
 | `tests/Test-WingetCore.ps1` | Offline parser and persistence regression tests |
 | `tests/Test-Project.ps1` | Repository-wide syntax, XAML, and lint checks |
 
