@@ -7,6 +7,10 @@ It provides a graphical interface, persistent update history, detailed failure l
 > [!NOTE]
 > This is a community tool and is not an official Microsoft application. It is designed for Windows and depends on Winget and WPF.
 
+## Screenshot
+
+![Winget Update Center showing available application updates](docs/screenshots/winget-update-center.png)
+
 ## Features
 
 - View every application detected by `winget list`
@@ -186,6 +190,9 @@ Open the **Update history** tab and double-click the failed row. Common causes i
 |-- .github/
 |   `-- workflows/
 |       `-- test.yml
+|-- docs/
+|   `-- screenshots/
+|       `-- winget-update-center.png
 |-- tests/
 |   |-- Test-Project.ps1
 |   `-- Test-WingetCore.ps1
@@ -204,6 +211,7 @@ Open the **Update history** tab and double-click the failed row. Common causes i
 | `WingetScheduledScan.ps1` | Noninteractive scheduled scan and notification entry point |
 | `Launch-Winget-Updater.cmd` | Double-click launcher using Windows PowerShell 5.1 |
 | `PSScriptAnalyzerSettings.psd1` | Cross-version lint policy for intentional analyzer exceptions |
+| `docs/screenshots/winget-update-center.png` | Screenshot displayed on the GitHub project page |
 | `tests/Test-WingetCore.ps1` | Offline parser and persistence regression tests |
 | `tests/Test-Project.ps1` | Repository-wide syntax, XAML, and lint checks |
 
@@ -229,3 +237,4 @@ Issues and pull requests are welcome. Please include:
 - Reproduction steps
 
 Remove personal information from exported inventories and logs before attaching them to an issue.
+
