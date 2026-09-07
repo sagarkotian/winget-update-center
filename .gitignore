@@ -8,6 +8,18 @@
 TestResults/
 .vscode/
 .idea/
+.vs/
+.dotnet/
+.dotnet-home/
+bin/
+obj/
+AppPackages/
+BundleArtifacts/
+*.appx
+*.appxbundle
+*.msix
+*.msixbundle
+*.pfx
 
 # Windows and macOS metadata
 Thumbs.db

@@ -1,17 +1,99 @@
-# Winget Update Center
+# Winget Update Center for Command Palette
 
-Winget Update Center is a self-contained Windows PowerShell application for reviewing installed software, checking available versions, and applying updates through Windows Package Manager (`winget`).
+Winget Update Center is a PowerToys Command Palette extension that finds applications already installed on the computer, checks which ones have updates available, and lets the user update one app or all apps through Windows Package Manager (`winget`). It also provides a single Command Palette Dock button with a flyout for reviewing, refreshing, or installing updates without opening a separate updater window.
 
-It provides a graphical interface, persistent update history, detailed failure logs, CSV exports, and optional scheduled update checks without requiring third-party PowerShell modules or external accounts.
+The original PowerShell/WPF application remains in the repository as a legacy standalone interface.
 
 > [!NOTE]
-> This is a community tool and is not an official Microsoft application. It is designed for Windows and depends on Winget and WPF.
+> This is a community tool and is not an official Microsoft application. It runs only on Windows and delegates package detection and installation to Winget.
 
-## Screenshot
+## Command Palette features
+
+- Search every application detected by `winget list`
+- Show installed version, package ID, source, and available version
+- Put apps with updates first and give each one an **Update** action
+- Update every available package from one command
+- Refresh automatically after an update completes
+- Report scan and update failures directly in Command Palette
+- Add a persistent icon-only Dock button with a flyout for **Review installed apps**, **Check for updates**, and **Update all**
+- Show a native indeterminate progress bar while Winget is working
+- Use subtle, theme-friendly status accents for checked, update-available, and up-to-date entries
+- Run Winget operations in the background so the palette stays responsive
+
+## Requirements
+
+To run the extension:
+
+- Windows 11
+- PowerToys with Command Palette and Dock support
+- App Installer / Windows Package Manager (`winget`)
+
+To build and deploy it:
+
+- Visual Studio 2022 or later with the WinUI application development workload
+- .NET 10 SDK
+- Windows 11 Developer Mode enabled
+
+## Build and install the extension
+
+1. Open `WingetUpdateCenter.sln` in Visual Studio.
+2. Select `Debug` and the architecture matching the computer (`x64` on most PCs).
+3. Select the **Winget Update Center (Package)** launch profile.
+4. Choose **Build > Deploy WingetUpdateCenter.CommandPalette**. Building without deploying does not register the extension.
+5. Open Command Palette and run **Reload Command Palette extensions**.
+6. Search for **Winget Update Center** and open it.
+
+The first scan starts when the page opens. Selecting an app with an available version starts its exact Winget upgrade; apps already current remain visible for inventory and search.
+
+## Add it to the Dock
+
+1. Open Command Palette settings and enable the Dock.
+2. Enter Dock edit mode and add the **Winget Update Center** band.
+3. Place the band on the desired edge or floating Dock.
+
+The Dock shows only the custom Winget Update Center icon. Selecting it opens a compact action page whose **More actions** menu provides the full app list, a rescan, and an update-all command. The extension name remains visible in the expanded view.
+
+## Prepare a release package
+
+The project version is defined in `WingetUpdateCenter.CommandPalette.csproj` and must match the versions in `Package.appxmanifest` and `app.manifest`. The repository validation test checks this automatically.
+
+Before publishing, replace the development identity values in both the project and package manifest with the exact package identity and publisher assigned by Microsoft Partner Center. Then build and test both supported architectures:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\Test-Project.ps1
+dotnet run --project .\tests\WingetUpdateCenter.CoreTests\WingetUpdateCenter.CoreTests.csproj --configuration Release
+dotnet build .\WingetUpdateCenter.CommandPalette\WingetUpdateCenter.CommandPalette.csproj --configuration Release -p:Platform=x64 -p:RuntimeIdentifier=win-x64
+dotnet build .\WingetUpdateCenter.CommandPalette\WingetUpdateCenter.CommandPalette.csproj --configuration Release -p:Platform=ARM64 -p:RuntimeIdentifier=win-arm64
+```
+
+Create signed MSIX packages through Visual Studio's **Package and Publish** menu or with `GenerateAppxPackageOnBuild=true` after configuring the release certificate. Do not distribute an unsigned package or commit a `.pfx` certificate. Test the installed package on each target architecture, reload Command Palette extensions, and verify the Dock icon, scan, individual update, update-all, progress, and error states before submission.
+
+## Command Palette project structure
+
+```text
+WingetUpdateCenter.CommandPalette/
+|-- Assets/                         MSIX and extension icons
+|-- Commands/                       Refresh and upgrade commands
+|-- Models/                         Winget inventory records
+|-- Pages/                          Searchable installed-app page
+|-- Properties/                     Package launch and publish profiles
+|-- Services/                       Winget process runner and table parser
+|-- Package.appxmanifest            COM and Command Palette registration
+|-- Program.cs                      Out-of-process COM server
+`-- WingetUpdateCenter.CommandPalette.csproj
+```
+
+The CLSID in `WingetUpdateCenterExtension.cs` must remain identical to both CLSID entries in `Package.appxmanifest`. `tests/Test-CommandPaletteProject.ps1` guards that registration and checks the required package assets.
+
+## Legacy PowerShell/WPF application
+
+The files `WingetUpdater.ps1`, `WingetCore.psm1`, and `WingetScheduledScan.ps1` provide the previous standalone UI, including history, logs, CSV export, and scheduled scans. They are not required by the Command Palette extension.
+
+### Legacy screenshot
 
 ![Winget Update Center showing available application updates](docs/screenshots/winget-update-center.png)
 
-## Features
+### Legacy features
 
 - View every application detected by `winget list`
 - See installed and available versions in separate columns
@@ -25,7 +107,7 @@ It provides a graphical interface, persistent update history, detailed failure l
 - Keep scans and updates responsive by running Winget work in background jobs
 - Store all runtime data under the current Windows user profile
 
-## Requirements
+### Legacy requirements
 
 - Windows 10 version 1809 or later, or Windows 11
 - [App Installer / Windows Package Manager](https://learn.microsoft.com/windows/package-manager/winget/)
@@ -41,7 +123,7 @@ winget --version
 
 If the command is unavailable, install or update **App Installer** from the Microsoft Store.
 
-## Quick start
+### Legacy quick start
 
 1. Download the repository as a ZIP file and extract it, or clone it with Git.
 2. Keep the PowerShell module and scripts together in the same directory.
@@ -56,7 +138,7 @@ powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\WingetUpdater.ps1
 
 The execution-policy option applies only to this process. It does not modify the machine or user execution-policy configuration.
 
-## Using the application
+### Using the legacy application
 
 ### Review available updates
 
@@ -86,7 +168,7 @@ The **All installed** tab shows applications Winget can detect from package-mana
 
 Select the relevant tab and choose **Export CSV**. The exported columns match the selected inventory or history view.
 
-## Update history and failure logs
+### Update history and failure logs
 
 The **Update history** tab is loaded automatically every time the application starts. Each attempted package upgrade records:
 
@@ -103,7 +185,7 @@ Failed upgrades also receive a detailed text log containing the command, exit co
 - Choose **Open logs** to open the complete log directory.
 - **Clear history** removes history records but deliberately keeps detailed failure logs.
 
-## Scheduled scans
+### Scheduled scans
 
 Choose **Schedule scans** to configure a daily or weekly background check. The application creates a current-user Windows Scheduled Task named:
 
@@ -123,7 +205,7 @@ Scheduled scans:
 
 Creating or changing a scheduled task can require administrator approval on managed computers.
 
-## Persistent data
+### Persistent data
 
 Runtime data is stored outside the repository under:
 
@@ -141,6 +223,8 @@ Runtime data is stored outside the repository under:
 Data is isolated per Windows user. Removing the repository does not automatically delete this data or an enabled scheduled task.
 
 ## Privacy and security
+
+See the [Winget Update Center privacy policy](PRIVACY.md) for the Store-ready privacy statement.
 
 - The tool does not require an online account, API key, or credential.
 - It does not add telemetry or send history files to another service.
@@ -183,7 +267,7 @@ Open the **Update history** tab and double-click the failed row. Common causes i
 4. Confirm that the script directory still exists.
 5. Re-save the schedule from the application if the repository was moved.
 
-## Project structure
+### Legacy project structure
 
 ```text
 .
@@ -225,7 +309,13 @@ Run all checks with Windows PowerShell:
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\Test-Project.ps1
 ```
 
-The GitHub Actions workflow runs the same command on `windows-latest` for pushes, pull requests, and manual workflow dispatches.
+Run the C# Winget table parser regression tests with the .NET 10 SDK:
+
+```powershell
+dotnet run --project .\tests\WingetUpdateCenter.CoreTests\WingetUpdateCenter.CoreTests.csproj
+```
+
+The GitHub Actions workflow runs both suites and compile-checks the Command Palette source on `windows-latest` for pushes, pull requests, and manual workflow dispatches.
 
 ## Contributing
 
@@ -237,4 +327,3 @@ Issues and pull requests are welcome. Please include:
 - Reproduction steps
 
 Remove personal information from exported inventories and logs before attaching them to an issue.
-

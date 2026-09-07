@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Winget Update Center (Package)": {
+      "commandName": "MsixPackage",
+      "doNotLaunchApp": true
+    },
+    "Winget Update Center (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

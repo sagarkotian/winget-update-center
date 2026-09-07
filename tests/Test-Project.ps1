@@ -4,11 +4,11 @@ Set-StrictMode -Version Latest
 $repositoryRoot = Split-Path $PSScriptRoot -Parent
 $powerShellFiles = @(
     Get-ChildItem -Path $repositoryRoot -Recurse -File -Include '*.ps1', '*.psm1' |
-        Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' }
+        Where-Object { $_.FullName -notmatch '[\\/](?:\.git|\.dotnet(?:-home)?|bin|obj|AppPackages|BundleArtifacts|TestResults)[\\/]' }
 )
 $textFiles = @(
     Get-ChildItem -Path $repositoryRoot -Recurse -File -Include '*.ps1', '*.psm1', '*.md', '*.cmd', '*.yml', '*.yaml' |
-        Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' }
+        Where-Object { $_.FullName -notmatch '[\\/](?:\.git|\.dotnet(?:-home)?|bin|obj|AppPackages|BundleArtifacts|TestResults)[\\/]' }
 )
 
 foreach ($file in $powerShellFiles) {
@@ -21,6 +21,7 @@ foreach ($file in $powerShellFiles) {
 }
 
 & (Join-Path $PSScriptRoot 'Test-WingetCore.ps1')
+& (Join-Path $PSScriptRoot 'Test-CommandPaletteProject.ps1')
 
 Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
 $uiPath = Join-Path $repositoryRoot 'WingetUpdater.ps1'
@@ -66,7 +67,10 @@ foreach ($file in $textFiles) {
 $requiredFiles = @(
     'README.md', '.gitignore', '.gitattributes', 'Launch-Winget-Updater.cmd',
     'PSScriptAnalyzerSettings.psd1', 'WingetCore.psm1', 'WingetScheduledScan.ps1',
-    'WingetUpdater.ps1'
+    'WingetUpdater.ps1', 'WingetUpdateCenter.sln', 'Directory.Build.props',
+    'Directory.Packages.props', 'nuget.config',
+    'WingetUpdateCenter.CommandPalette\WingetUpdateCenter.CommandPalette.csproj',
+    'WingetUpdateCenter.CommandPalette\Package.appxmanifest'
 )
 foreach ($relativePath in $requiredFiles) {
     if (-not (Test-Path -LiteralPath (Join-Path $repositoryRoot $relativePath) -PathType Leaf)) {
